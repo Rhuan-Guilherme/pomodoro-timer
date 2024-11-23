@@ -9,9 +9,7 @@ function App() {
   return (
     <ThemeProvider theme={defaultTheme}>
       <BrowserRouter>
-              <Router />
- 
-        
+        <Router />
         <GlobalStyle />
       </BrowserRouter>
     </ThemeProvider>
