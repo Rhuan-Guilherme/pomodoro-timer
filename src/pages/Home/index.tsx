@@ -11,7 +11,7 @@ import {
   Separetor,
   TaskInput,
 } from './styles';
-import { useState } from 'react';
+import { act, useState } from 'react';
 
 const newCycleFormValidationSchema = z.object({
   task: z.string().min(1, 'Informe a tarefa.'),
@@ -32,6 +32,7 @@ interface Cycle {
 export function Home() {
   const [cycle, setCycle] = useState<Cycle[]>([]);
   const [cycleActiveId, setCycleActiveId] = useState<string | null>(null);
+  const [ammountSecondsPassed, setAmmountSecondsPassed] = useState<number>(0);
 
   const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
@@ -55,6 +56,15 @@ export function Home() {
   }
 
   const activeCycle = cycle.find((cycle) => cycle.id === cycleActiveId);
+
+  const totalSeconds = activeCycle ? activeCycle.minutsAmmount * 60 : 0;
+  const currentSeconds = activeCycle ? totalSeconds - ammountSecondsPassed : 0;
+
+  const minutesAmmount = Math.floor(totalSeconds / 60);
+  const secondsAmmount = currentSeconds % 60;
+
+  const minutes = String(minutesAmmount).padStart(2, '0');
+  const seconds = String(secondsAmmount).padStart(2, '0');
 
   const taksWatch = watch('task');
   const isSubmitDisabled = !taksWatch;
@@ -94,11 +104,11 @@ export function Home() {
         </FormContainer>
 
         <CountDownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separetor>:</Separetor>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountDownContainer>
 
         <ButtonStartContDown disabled={isSubmitDisabled} type="submit">
