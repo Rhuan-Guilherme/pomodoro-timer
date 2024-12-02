@@ -2,6 +2,7 @@ import { Play } from 'phosphor-react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 import { useForm } from 'react-hook-form';
+import { differenceInSeconds } from 'date-fns';
 import {
   ButtonStartContDown,
   CountDownContainer,
@@ -11,7 +12,7 @@ import {
   Separetor,
   TaskInput,
 } from './styles';
-import { act, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const newCycleFormValidationSchema = z.object({
   task: z.string().min(1, 'Informe a tarefa.'),
@@ -27,6 +28,7 @@ interface Cycle {
   id: string;
   task: string;
   minutsAmmount: number;
+  startDate: Date;
 }
 
 export function Home() {
@@ -47,10 +49,12 @@ export function Home() {
       id: String(new Date().getTime()),
       task: data.task,
       minutsAmmount: data.minutsAmmount,
+      startDate: new Date(),
     };
 
     setCycle((state) => [...state, newCycle]);
     setCycleActiveId(newCycle.id);
+    setAmmountSecondsPassed(0);
 
     reset();
   }
@@ -60,7 +64,7 @@ export function Home() {
   const totalSeconds = activeCycle ? activeCycle.minutsAmmount * 60 : 0;
   const currentSeconds = activeCycle ? totalSeconds - ammountSecondsPassed : 0;
 
-  const minutesAmmount = Math.floor(totalSeconds / 60);
+  const minutesAmmount = Math.floor(currentSeconds / 60);
   const secondsAmmount = currentSeconds % 60;
 
   const minutes = String(minutesAmmount).padStart(2, '0');
@@ -68,6 +72,27 @@ export function Home() {
 
   const taksWatch = watch('task');
   const isSubmitDisabled = !taksWatch;
+
+  useEffect(() => {
+    let interval: number;
+    if (activeCycle) {
+      interval = setInterval(() => {
+        setAmmountSecondsPassed(
+          differenceInSeconds(new Date(), activeCycle.startDate)
+        );
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [activeCycle]);
+
+  useEffect(() => {
+    if (activeCycle) {
+      document.title = `${minutes}:${seconds}`;
+    }
+  }, [minutes, seconds, activeCycle]);
 
   return (
     <HomeContainer>
