@@ -78,6 +78,7 @@ export function CyclesContextProvider({
 
   function markCurrentCycleAsFinished() {
     dispatch(markCurrentCycleAsFinishedAction());
+    document.title = 'The Timer';
   }
 
   function setSecondsPassed(seconds: number) {
@@ -98,6 +99,7 @@ export function CyclesContextProvider({
 
   function interruptCurrentCycle() {
     dispatch(interruptCurrentCycleAction());
+    document.title = 'The Timer';
   }
 
   return (
